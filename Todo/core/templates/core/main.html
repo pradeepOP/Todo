@@ -1,0 +1,75 @@
+{% load static tailwind_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Todo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% tailwind_css %}
+    <style>
+        .htmx-swapping {
+            opacity: 0;
+            transition: opacity 1s ease-out
+        }
+    </style>
+</head>
+
+<body class="bg-color-primary  tracking-wider">
+    <header class="pt-8">
+        <div class=" container animate-movingY">
+            <div class="w-1/2 mx-auto">
+
+                <img src="{% static 'img/hero.png' %}" alt="" class="w-1/2 lg:w-1/4 mx-auto ">
+
+            </div>
+        </div>
+    </header>
+    <section>
+        <div class=" container p-5 w-4/5 md:w-3/5 rounded-lg bg-color-primary-light">
+
+            <form action="" class="flex mb-6 space-x-4" hx-post="{% url 'add-todo' %}" hx-target="#todos"
+                hx-swap="afterend">
+                {% csrf_token %}
+                <input type="text" name="title" class="title flex-1 px-4 py-3 bg-gray-200 rounded-lg "
+                    placeholder="The title">
+
+                <button
+                    class="p-3 rounded-xl text-text-color bg-color-secondary hover:bg-color-secondary-dark">+</button>
+            </form>
+
+            <div class="flex py-3">
+                <div class="w-4/5 px-6">
+                    <p class=" text-lg text-color-secondary-dark font-medium uppercase">Title</p>
+                </div>
+
+                <div class=" hidden md:block w-1/5 px-6 text-right ">
+                    <p class="text-lg font-medium text-color-secondary-dark uppercase  ">Actions</p>
+                </div>
+            </div>
+
+            <div class="" id="todos">
+                {% for todo in todos %}
+                {% include 'core/partials/todo.html'  %}
+                {% endfor %}
+
+            </div>
+        </div>
+    </section>
+
+</body>
+<script src="https://unpkg.com/htmx.org@1.9.9"
+    integrity="sha384-QFjmbokDn2DjBjq+fM+8LUIVrAgqcNW2s0PjAxHETgRn9l4fvX31ZxDxvwQnyMOX"
+    crossorigin="anonymous"></script>
+<script>
+    document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+    });
+    document.body.addEventListener('htmx:afterRequest', (e) => {
+        document.querySelector('input.title').value = "";
+    })
+</script>
+
+</html>
